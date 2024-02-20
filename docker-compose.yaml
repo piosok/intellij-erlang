@@ -1,0 +1,18 @@
+version: '3.2'
+
+services:
+  centos7:
+      image: nexus.computaris.net:4433/msve/compile-centos7:1.0
+      build:
+          context: centos7
+          dockerfile: Dockerfile
+          args:
+          - NEXUS_USER=${NEXUS_USER}
+          - NEXUS_PASS=${NEXUS_PASS}
+          - BUILDER_UID=${BUILDER_UID}
+          - BUILDER_GID=${BUILDER_GID}
+      volumes:
+        - .:/work:rw
+      user: "${BUILDER_UID}:${BUILDER_GID}"
+      command: tail -f /dev/null
+
