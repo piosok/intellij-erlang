@@ -202,7 +202,12 @@ public class ErlangSdkType extends SdkType {
 
   @Override
   public void setupSdkPaths(@NotNull Sdk sdk) {
-    configureSdkPaths(sdk);
+	  ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                @Override
+                public void run() {
+			    configureSdkPaths(sdk);
+                }
+            });
   }
 
   @Nullable
