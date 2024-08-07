@@ -19,8 +19,9 @@ package org.intellij.erlang.rebar.importWizard;
 import com.intellij.ide.util.ElementsChooser;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.projectImport.SelectImportedProjectsStep;
-import com.intellij.vcsUtil.VcsFileUtil;
+import com.intellij.openapi.util.io.FileUtil;
 import org.intellij.erlang.icons.ErlangIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,7 +70,7 @@ final class SelectImportedOtpAppsStep extends SelectImportedProjectsStep<Importe
   @Override
   protected String getElementText(@NotNull ImportedOtpApp app) {
     String projectFileDirectory = getWizardContext().getProjectFileDirectory();
-    String relativePath = VcsFileUtil.relativePath(new File(projectFileDirectory), app.getRoot());
+    String relativePath = FileUtil.getRelativePath(new File(projectFileDirectory), VfsUtilCore.virtualToIoFile(app.getRoot())).replace(File.separatorChar, '/');
     return ".".equals(relativePath) ? relativePath + " (" + app.getName() + ")" : relativePath;
   }
 
