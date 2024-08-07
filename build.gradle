@@ -13,12 +13,6 @@ subprojects {
 
 
 allprojects {
-<<<<<<< HEAD
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
-=======
   repositories { mavenCentral() }
 
   dependencies {
@@ -29,7 +23,6 @@ allprojects {
     testCompileOnly 'junit:junit:4.13.1'
   }
 
->>>>>>> ign/master
   apply plugin: 'java'
   sourceCompatibility = javaVersion
   targetCompatibility = javaTargetVersion
@@ -45,15 +38,6 @@ allprojects {
     }
   }
 
-<<<<<<< HEAD
-  apply plugin: 'org.jetbrains.intellij'
-  intellij {
-    version = ideaVersion
-    type.set("IC")
-    plugins = ['copyright', 'java']
-    downloadSources = Boolean.valueOf(sources)
-    sameSinceUntilBuild = Boolean.valueOf(isEAP)
-=======
 
   intellijPlatform {
     version = "${version}.$buildNumber"
@@ -76,7 +60,6 @@ allprojects {
       ijp.testFramework(TestFrameworkType.Platform.INSTANCE)
       ijp.testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
     }
->>>>>>> ign/master
   }
   
   def compilationPackages = ['org/intellij/erlang/build/**', 'org/intellij/erlang/jps/**']
@@ -110,11 +93,6 @@ allprojects {
 }
 
 repositories {
-<<<<<<< HEAD
-  mavenLocal()
-  jcenter()
-=======
->>>>>>> ign/master
   flatDir {
     dirs 'libs'
   }
