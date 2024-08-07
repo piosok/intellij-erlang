@@ -38,6 +38,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.PathUtil;
 import com.intellij.util.ResourceUtil;
+import com.intellij.util.SlowOperations;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -101,8 +102,8 @@ public class ErlangXDebugProcess extends XDebugProcess implements ErlangDebugger
       throw new ExecutionException(e);
     }
 
-    // it's important to set modules to interpret before running debug target
-    setModulesToInterpret();
+    // it's important to set modules to interpret before running the debug target
+    SlowOperations.allowSlowOperations(this::setModulesToInterpret);
     //TODO split running debug target and debugger process spawning
     myErlangProcessHandler = runDebugTarget();
 
@@ -305,8 +306,7 @@ public class ErlangXDebugProcess extends XDebugProcess implements ErlangDebugger
     myDebuggerNode.setBreakpoint(breakpointPosition.getErlangModuleName(), breakpointPosition.getLine());
   }
 
-  void removeBreakpoint(XLineBreakpoint<ErlangLineBreakpointProperties> breakpoint,
-                        @SuppressWarnings("UnusedParameters") boolean temporary) {
+  void removeBreakpoint(XLineBreakpoint<ErlangLineBreakpointProperties> breakpoint) {
     ErlangSourcePosition breakpointPosition = getErlangSourcePosition(breakpoint);
     if (breakpointPosition == null) return;
     myPositionToLineBreakpointMap.remove(breakpointPosition);
@@ -387,13 +387,12 @@ public class ErlangXDebugProcess extends XDebugProcess implements ErlangDebugger
       commandLine.addParameters("-pa", tempDirectory.getPath());
     }
     catch (IOException e) {
-      throw new ExecutionException("Failed to setup debugger environment", e);
+      throw new ExecutionException("Failed to setup debugger environment: " + e.getMessage(), e);
     }
   }
 
   private static void copyBeamTo(String beamName, File directory) throws IOException {
-    // ClassLoader cl=ErlangXDebugProcess.class.getClassLoader();
-    try (var inputStream = ErlangXDebugProcess.class.getResourceAsStream("/debugger/beams/"+beamName)) {
+    try (var inputStream = ResourceUtil.getResourceAsStream(ErlangXDebugProcess.class.getClassLoader(), "/debugger/beams", beamName)) {
       if (inputStream == null) {
         throw new IOException("Failed to locate debugger module: " + beamName);
       }

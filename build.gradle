@@ -1,25 +1,39 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
+
 plugins {
-  id 'org.jetbrains.intellij' version "1.16.0"
+  id 'org.jetbrains.intellij.platform' version "2.0.0"
 }
 
-dependencies {
-  testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.6.1'
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.3'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.3'
-  testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.3'
-  testCompileOnly 'junit:junit:4.13.1'
+apply plugin: 'org.jetbrains.intellij.platform'
+
+subprojects {
+  apply plugin: 'org.jetbrains.intellij.platform.module'
 }
 
-version = "${version}.$buildNumber"
+
 allprojects {
+<<<<<<< HEAD
   repositories {
     mavenLocal()
     mavenCentral()
   }
+=======
+  repositories { mavenCentral() }
+
+  dependencies {
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.6.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.3'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.3'
+    testCompileOnly 'junit:junit:4.13.1'
+  }
+
+>>>>>>> ign/master
   apply plugin: 'java'
   sourceCompatibility = javaVersion
   targetCompatibility = javaTargetVersion
-  tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+  tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 
   sourceSets {
     main {
@@ -31,6 +45,7 @@ allprojects {
     }
   }
 
+<<<<<<< HEAD
   apply plugin: 'org.jetbrains.intellij'
   intellij {
     version = ideaVersion
@@ -38,6 +53,30 @@ allprojects {
     plugins = ['copyright', 'java']
     downloadSources = Boolean.valueOf(sources)
     sameSinceUntilBuild = Boolean.valueOf(isEAP)
+=======
+
+  intellijPlatform {
+    version = "${version}.$buildNumber"
+//    plugins = ['copyright', 'java']
+//    downloadSources = Boolean.valueOf(sources)
+//    sameSinceUntilBuild = Boolean.valueOf(isEAP)
+  }
+
+  repositories {
+    intellijPlatform {
+      defaultRepositories()
+    }
+  }
+
+  dependencies {
+    intellijPlatform { IntelliJPlatformDependenciesExtension ijp ->
+      ijp.intellijIdeaCommunity("242.20224.91")
+      ijp.bundledPlugins("com.intellij.copyright", "com.intellij.java")
+      ijp.instrumentationTools()
+      ijp.testFramework(TestFrameworkType.Platform.INSTANCE)
+      ijp.testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
+    }
+>>>>>>> ign/master
   }
   
   def compilationPackages = ['org/intellij/erlang/build/**', 'org/intellij/erlang/jps/**']
@@ -71,8 +110,11 @@ allprojects {
 }
 
 repositories {
+<<<<<<< HEAD
   mavenLocal()
   jcenter()
+=======
+>>>>>>> ign/master
   flatDir {
     dirs 'libs'
   }
