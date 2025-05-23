@@ -32,6 +32,7 @@ import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
 import com.intellij.util.download.FileDownloader;
 import org.intellij.erlang.rebar.runner.RebarRunningStateUtil;
+import org.intellij.erlang.utils.ErlangUiUtil;
 import org.intellij.erlang.utils.ExtProcessUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,12 +51,19 @@ public class RebarConfigurationForm {
   private JPanel myLinkContainer;
 
   public RebarConfigurationForm() {
-    myRebarPathSelector.addBrowseFolderListener("Select Rebar Executable", "", null,
-                                                FileChooserDescriptorFactory.createSingleLocalFileDescriptor());
+    ErlangUiUtil.addBrowseFolderListener(myRebarPathSelector, "Select Rebar Executable", "", null,
+                                         FileChooserDescriptorFactory.singleFile());
     myRebarPathSelector.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(@NotNull DocumentEvent documentEvent) {
         validateRebarPath(RebarConfigurationForm.this.myRebarPathSelector.getText(), s -> myRebarVersionText.setText(s));
+      }
+    });
+
+    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      String rebarPath = RebarRunningStateUtil.getRebarPath(null);
+      if (getPath().isEmpty()) {
+        ApplicationManager.getApplication().invokeLater(() -> setPath(rebarPath));
       }
     });
   }
@@ -77,14 +85,14 @@ public class RebarConfigurationForm {
   }
 
   private static void validateRebarPath(String rebarPath, Consumer<String> consumer) {
-    File rebarFile = new File(rebarPath);
-    if (!rebarFile.exists()) {
-      consumer.accept("");
-      return;
-    }
-
     ApplicationManager.getApplication().executeOnPooledThread(
       () -> {
+        File rebarFile = new File(rebarPath);
+        if (!rebarFile.exists()) {
+          consumer.accept("File " + rebarPath + " not found");
+          return;
+        }
+
         ExtProcessUtil.ExtProcessOutput rebar = ExtProcessUtil.execAndGetFirstLine(3000, rebarPath, "--version");
         String version = rebar.getStdOut();
 

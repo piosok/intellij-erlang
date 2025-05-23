@@ -24,6 +24,7 @@ import com.intellij.execution.process.ScriptRunnerUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -31,6 +32,8 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ObjectUtils;
+import com.intellij.util.concurrency.ThreadingAssertions;
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread;
 import org.intellij.erlang.jps.model.JpsErlangSdkType;
 import org.intellij.erlang.rebar.settings.RebarSettings;
 import org.intellij.erlang.sdk.ErlangSdkType;
@@ -44,6 +47,7 @@ import java.util.List;
 
 public class RebarRunningStateUtil {
   private static final String REBAR = "rebar3";
+  private static final Logger LOG = Logger.getInstance(RebarRunningStateUtil.class);
 
   private RebarRunningStateUtil() {
   }
@@ -116,6 +120,7 @@ public class RebarRunningStateUtil {
   }
 
   @NotNull
+  @RequiresBackgroundThread
   public static String findEscriptExecutable() {
     String which = which(JpsErlangSdkType.SCRIPT_INTERPRETER);
     if (StringUtil.isNotEmpty(which)) return which;
@@ -123,18 +128,21 @@ public class RebarRunningStateUtil {
   }
 
   @NotNull
+  @RequiresBackgroundThread
   private static String which(@NotNull String name) {
-    boolean isPosix = SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix;
-    if (!isPosix) return "";
+    ThreadingAssertions.assertBackgroundThread();
 
-    String output = "";
+    if (!(SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix)) return "";
+
     try {
-      GeneralCommandLine which = new GeneralCommandLine("which");
-      which.addParameter(name);
-      output = ScriptRunnerUtil.getProcessOutput(which);
+      GeneralCommandLine command = new GeneralCommandLine("which");
+      command.addParameter(name);
+      return ScriptRunnerUtil.getProcessOutput(command).trim();
     }
-    catch (Exception ignored) {
+    catch (Exception e) {
+      LOG.warn(e);
+      return "";
     }
-    return output.trim();
   }
+
 }

@@ -90,10 +90,11 @@
         <typedHandler implementation="org.intellij.erlang.editor.ErlangTypedHandler" id="ErlangBinary"/>
         <enterHandlerDelegate implementation="org.intellij.erlang.editor.ErlangEnterInCommentsHandler" id="ErlangEnterInComments"/>
         <enterHandlerDelegate implementation="org.intellij.erlang.editor.ErlangEnterHandler" id="ErlangEnter"/>
-        <enterHandlerDelegate implementation="org.intellij.erlang.editor.ErlangEnterBetweenBracesHandler" id="ErlangEnterBetweenBraces"/>
+        <enterBetweenBracesDelegate language="Erlang" implementationClass="org.intellij.erlang.editor.ErlangEnterBetweenBracesDelegate" id="ErlangEnterBwetweenBraces"/>
 
         <extendWordSelectionHandler implementation="org.intellij.erlang.editor.ErlangWordSelectioner" order="last"/>
         <lang.smartEnterProcessor language="Erlang" implementationClass="org.intellij.erlang.editor.ErlangClausesSmartEnterProcessor" id="ErlangClause"/>
+        <lang.smartEnterProcessor language="Erlang" implementationClass="org.intellij.erlang.editor.ErlangTerminatorSmartEnterProcessor" id="ErlangTerm" order="after ErlangClause"/>
         <lang.elementManipulator forClass="org.intellij.erlang.psi.impl.ErlangStringLiteralImpl"
                                  implementationClass="org.intellij.erlang.editor.ErlangStringManipulator"/>
         <lang.elementManipulator forClass="org.intellij.erlang.psi.impl.ErlangASTFactory$ErlangCommentImpl" order="first"
@@ -105,6 +106,7 @@
         <lang.foldingBuilder language="Erlang" implementationClass="org.intellij.erlang.editor.ErlangFoldingBuilder"/>
 
         <sdkType implementation="org.intellij.erlang.sdk.ErlangSdkType"/>
+        <workspaceModel.fileIndexContributor implementation="org.intellij.erlang.sdk.ErlangExcludeHtmlFileIndexContributor"/>
         <!-- run -->
         <programRunner implementation="org.intellij.erlang.runconfig.ErlangRunner"/>
         <configurationType implementation="org.intellij.erlang.application.ErlangApplicationRunConfigurationType"/>
@@ -136,6 +138,7 @@
         <breadcrumbsInfoProvider implementation="org.intellij.erlang.ErlangBreadcrumbsProvider"/>
 
         <codeInsight.parameterInfo language="Erlang" implementationClass="org.intellij.erlang.ErlangParameterInfoHandler"/>
+        <codeInsight.parameterNameHints language="Erlang" implementationClass="org.intellij.erlang.hints.ErlangInlayHintsProvider"/>
         <codeInsight.gotoSuper language="Erlang" implementationClass="org.intellij.erlang.navigation.ErlangGotoSuperHandler"/>
 
         <fileBasedIndex implementation="org.intellij.erlang.index.ErlangModuleIndex"/>
@@ -215,6 +218,12 @@
         <localInspection language="Erlang" shortName="Erlang25Syntax" displayName="Erlang 25.0 syntax"
                          groupName="Erlang" enabledByDefault="true" level="ERROR"
                          implementationClass="org.intellij.erlang.inspection.Erlang25SyntaxInspection"/>
+        <localInspection language="Erlang" shortName="Erlang27Syntax" displayName="Erlang 27.0 syntax"
+                         groupName="Erlang" enabledByDefault="true" level="ERROR"
+                         implementationClass="org.intellij.erlang.inspection.Erlang27SyntaxInspection"/>
+        <localInspection language="Erlang" shortName="ErlangTripleQuotas" displayName="Erlang triple quotas syntax"
+                         groupName="Erlang" enabledByDefault="true" level="ERROR"
+                         implementationClass="org.intellij.erlang.inspection.ErlangTripleQuotasSyntaxInspection"/>
 
         <!--warnings-->
         <localInspection language="Erlang" shortName="Erlang18Syntax" displayName="Erlang 18.0 syntax"
@@ -262,6 +271,7 @@
         <spellchecker.bundledDictionaryProvider implementation="org.intellij.erlang.spellchecker.ErlangBundledDictionaryProvider"/>
 
         <fileTypeStatisticProvider implementation="org.intellij.erlang.ErlangFileTypeStatisticsProvider"/>
+        <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <intentionAction>
           <language>Erlang</language>

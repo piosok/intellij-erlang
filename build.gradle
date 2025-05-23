@@ -2,10 +2,16 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
 
 plugins {
-  id 'org.jetbrains.intellij.platform' version "2.0.0"
+  id("org.jetbrains.intellij.platform") version "2.6.0"
 }
 
 apply plugin: 'org.jetbrains.intellij.platform'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
 
 subprojects {
   apply plugin: 'org.jetbrains.intellij.platform.module'
@@ -24,9 +30,17 @@ allprojects {
   }
 
   apply plugin: 'java'
-  sourceCompatibility = javaVersion
-  targetCompatibility = javaTargetVersion
-  tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+  
+  // Only apply the main Java version if this is not the JPS module
+  // JPS module defines its own Java compatibility version (11)
+  if (project.name != 'jps-plugin') {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaTargetVersion
+  }
+  
+  tasks.withType(JavaCompile).configureEach { 
+    options.encoding = 'UTF-8' 
+  }
 
   sourceSets {
     main {
@@ -38,12 +52,15 @@ allprojects {
     }
   }
 
-
   intellijPlatform {
     version = "${version}.$buildNumber"
 //    plugins = ['copyright', 'java']
 //    downloadSources = Boolean.valueOf(sources)
 //    sameSinceUntilBuild = Boolean.valueOf(isEAP)
+  }
+
+  composedJar {
+    archiveVersion = ""
   }
 
   repositories {
@@ -54,7 +71,8 @@ allprojects {
 
   dependencies {
     intellijPlatform { IntelliJPlatformDependenciesExtension ijp ->
-      ijp.intellijIdeaCommunity("242.20224.91")
+      // https://data.services.jetbrains.com/products?code=IC
+      ijp.intellijIdeaCommunity("252.16512.17")
       ijp.bundledPlugins("com.intellij.copyright", "com.intellij.java")
       ijp.instrumentationTools()
       ijp.testFramework(TestFrameworkType.Platform.INSTANCE)
@@ -71,6 +89,7 @@ allprojects {
   }
 
   test {
+    environment 'NO_FS_ROOTS_ACCESS_CHECK', 'true'
     useJUnitPlatform {
       exclude compilationPackages
     }
@@ -101,6 +120,21 @@ repositories {
 dependencies {
   implementation name: 'OtpErlang'
   implementation project('jps-plugin')
+}
+
+// Add JPS Java 11 verification to the plugin build pipeline
+afterEvaluate {
+  tasks.named('prepareSandbox') {
+    dependsOn ':jps-plugin:verifyJpsJava11Compatibility'
+  }
+  
+  tasks.named('buildPlugin') {
+    dependsOn ':jps-plugin:verifyJpsJava11Compatibility'
+  }
+  
+  tasks.named('check') {
+    dependsOn ':jps-plugin:verifyJpsJava11Compatibility'
+  }
 }
 
 apply plugin: 'idea'

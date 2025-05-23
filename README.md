@@ -8,13 +8,14 @@ and other IntelliJ-based products
 [PyCharm](http://www.jetbrains.com/pycharm/), 
 [WebStorm](http://www.jetbrains.com/webstorm/), etc.) to a convenient [Erlang](http://www.erlang.org/) IDE.
 
+## Requirements
+- IntelliJ IDEA 2022.1 or later (Community or Ultimate)
+- Java 17 or later
+
+## For Developers
+If you're developing or modifying the plugin, please see the [Development Guide](docs/DEVELOPMENT.md) for information about Java version compatibility requirements.
+
 ## Pre-release builds
 Download [the latest successful plugin](https://teamcity.jetbrains.com/repository/download/IntellijIdeaPlugins_IntellijErlang_Tests/.lastSuccessful/intellij-erlang-0.11.{build.number}.zip?guest=1), hit 'Install plugin from disk...' at 'Plugins' page in 'Settings' of your IDE, and point it to the downloaded archive.
 
 Note for **Mac OS X** users: you need to download the entire zip file, not a several jars (see [Apple discussion forum](https://discussions.apple.com/thread/1483114)).
-
-## Recent changes
-### The latest version
-
-* IntelliJ 2021.2 support
-* Erlang plugin could be installed and upgraded without restart

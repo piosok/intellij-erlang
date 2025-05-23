@@ -6,11 +6,13 @@
 .idea/shelf/
 .idea/libraries/
 .idea/.name
+.intellijPlatform/
 *.iml
 
 /build/
 /jps-plugin/build/
 .gradle
 /out/
-/bin/
+/bin
 /jps-plugin/out/
+/jps-plugin/bin/
